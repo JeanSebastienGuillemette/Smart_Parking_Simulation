@@ -1,0 +1,13 @@
+# Secrets and local data
+.env
+cards.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Editor / tooling
+.vscode/
+.claude/settings.local.json
