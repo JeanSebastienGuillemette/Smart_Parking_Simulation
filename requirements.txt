@@ -1,1 +1,18 @@
+# Pi B - Cerveau et barrière
+
+# Config
 python-dotenv
+
+# RFID
+mfrc522
+spidev
+Rpi.GPIO
+
+# Servo + Help button
+gpiozero
+
+# XBee
+digi-xbee
+
+# BLE GATT server
+bluezero # needs system packages: python3-dbus, python3-gi (see README)

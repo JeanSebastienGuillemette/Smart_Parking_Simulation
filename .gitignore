@@ -10,4 +10,3 @@ venv/
 
 # Editor / tooling
 .vscode/
-.claude/settings.local.json
