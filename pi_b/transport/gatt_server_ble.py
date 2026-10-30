@@ -33,6 +33,8 @@ class BLEGattServer:
         self._peripheral = peripheral.Peripheral(
             adapter_address, local_name=BLE_DEVICE_NAME
         )
+        self._peripheral.on_connect = self._on_connect
+        self._peripheral.on_disconnect = self._on_disconnect
         self._peripheral.add_service(
             srv_id=_SRV_ID, uuid=SERVICE_GATE_UUID, primary=True
         )
@@ -53,7 +55,7 @@ class BLEGattServer:
             uuid=VOITURE_SORTIE_UUID,
             value=[],
             notifying=False,
-            flags=["write"],
+            flags=["write", "write-without-response"],
             write_callback=self._on_voiture_sortie_write,
         )
 
@@ -73,14 +75,38 @@ class BLEGattServer:
             uuid=OUVERTURE_AGENT_UUID,
             value=[],
             notifying=False,
-            flags=["write"],
+            flags=["write", "write-without-response"],
             write_callback=self._on_ouverture_agent_write,
         )
 
+        names = {
+            _CHR_RESULTAT_CARTE: "RESULTAT_CARTE",
+            _CHR_VOITURE_SORTIE: "VOITURE_SORTIE",
+            _CHR_APPEL_AIDE: "APPEL_AIDE",
+            _CHR_OUVERTURE_AGENT: "OUVERTURE_AGENT",
+        }
+        for chr_id, name in names.items():
+            self._peripheral.add_descriptor(
+                srv_id=_SRV_ID,
+                chr_id=chr_id,
+                dsc_id=1,
+                uuid="00002901-0000-1000-8000-00805f9b34fb",
+                value=list(name.encode()),
+                flags=["read"],
+            )
+
+    def _on_connect(self, device) -> None:
+        print(f"BLE : client connecté ({device.address})")
+
+    def _on_disconnect(self, device) -> None:
+        print(f"BLE : client déconnecté ({device.address})")
+
     def _on_voiture_sortie_write(self, value, options) -> None:
+        print(f"BLE : écriture reçue sur VOITURE_SORTIE : {value}")
         self._on_voiture_sortie()
 
     def _on_ouverture_agent_write(self, value, options) -> None:
+        print(f"BLE : écriture reçue sur OUVERTURE_AGENT : {value}")
         self._on_ouverture_agent()
 
     def notify_resultat_carte(self, autorisee: bool) -> None:
