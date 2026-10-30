@@ -12,7 +12,7 @@ gpiozero==2.0.1
 lgpio==0.2.2.0
 
 # XBee
-digi-xbee==1.5.0
+pyserial==3.5
 
 # BLE GATT server
 bluezero==0.9.1
