@@ -1,7 +1,6 @@
 # Secrets and local data
 .env
 cards.json
-tests
 
 # Python
 __pycache__/
