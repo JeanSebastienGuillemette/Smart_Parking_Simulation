@@ -1,6 +1,7 @@
 # Secrets and local data
 .env
 cards.json
+tests
 
 # Python
 __pycache__/
@@ -10,3 +11,11 @@ venv/
 
 # Editor / tooling
 .vscode/
+.claude/
+CLAUDE.md
+pi_b.md
+commun.md
+todo.txt
+
+# lgpio runtime files
+.lgd-nfy*

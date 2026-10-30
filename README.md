@@ -63,6 +63,7 @@ cd pi_b
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+pip install --no-deps mfrc522   # sans --no-deps, il installe RPi.GPIO, incompatible avec le Pi 5
 ```
 
 ## Configuration
@@ -72,12 +73,10 @@ pip install -r requirements.txt
    cp .env.example .env
    cp cards.example.json cards.json
    ```
-2. Ajouter les cartes autorisées dans `cards.json` (format : **À décider**).
-3. Ajuster `.env` au besoin :
-
-| Variable | Défaut | Description |
-|---|---|---|
-| `CARDS_FILE` | `cards.json` | Chemin de la liste des cartes autorisées |
+2. Ajouter les cartes autorisées dans `cards.json` : une liste d'objets `{"uid": <entier>, "name": "<texte>"}`.
+   L'UID est l'entier affiché par `python -m tests.rfid_test`.
+   La liste est toujours lue depuis `cards.json` à la racine du dépôt.
+3. Ajuster `.env` au besoin.
 
 `.env` et `cards.json` sont ignorés par Git : ne jamais les committer.
 
@@ -98,7 +97,3 @@ Scénarios à couvrir sans Pi A ni Pi C (mocks dans `tests/`) :
 - Bouton d'aide → `APPEL_AIDE` produit ; `OUVERTURE_AGENT` → la barrière s'ouvre.
 
 Commande de lancement des tests : **À décider** (par ex. `python -m pytest`).
-
-## Historique
-
-Voir [CHANGELOG.md](CHANGELOG.md).

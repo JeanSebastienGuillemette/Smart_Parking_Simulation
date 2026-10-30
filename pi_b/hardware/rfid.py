@@ -1,61 +1,44 @@
-import logging
 import threading
 import time
-from typing import Callable, Optional
- 
+
 from mfrc522 import SimpleMFRC522
- 
-logger = logging.getLogger(__name__)
- 
- 
+
+from pi_b.config import RFID_DEBOUNCE
+
+
+class FakeReader:
+    """Généré à 100% par Claude pour faire un faux reader rfid car les miens ne sont pas soudés!"""
+
+    def __init__(self, uids: list[int]) -> None:
+        self.uids = uids
+        self.index = 0
+
+    def read_id_no_block(self) -> int:
+        time.sleep(5)
+        uid = self.uids[self.index % len(self.uids)]
+        self.index += 1
+        return uid
+
+
 class RFIDSensor:
-    """Read RFID cards in a background thread and signal each new detection."""
- 
-    def __init__(
-        self,
-        on_card: Callable[[int], None],
-        debounce_s: float = 3.0,
-        poll_interval_s: float = 0.1,
-    ) -> None:
-        self.card_reader = SimpleMFRC522
-        # TODO: create the SimpleMFRC522 instance
-        # TODO: store on_card, debounce_s, poll_interval_s
-        # TODO: debounce state -> what two things must you remember?
-        self._stop_event = threading.Event()
-        self._thread: Optional[threading.Thread] = None
- 
+    """Lis les cartes dans son propre thread et call on_card(uid)."""
+
+    def __init__(self, on_card, reader=None) -> None:
+        self.reader = reader or SimpleMFRC522()
+        self.on_card = on_card
+        self.last_uid = None
+        self.last_time = 0.0
+
     def start(self) -> None:
-        """Start the reading thread. Calling it twice must not create two threads."""
-        # TODO: guard against double start
-        # TODO: create the thread (target=self._run), daemon or not? why?
-        ...
- 
-    def stop(self) -> None:
-        """Ask the thread to stop, wait for it, release the GPIO."""
-        # TODO: signal the event
-        # TODO: join with a timeout
-        # TODO: GPIO cleanup
-        ...
- 
-    def read_card(self) -> Optional[int]:
-        """One NON-blocking read attempt. Return the UID, or None if no card."""
-        ...
- 
+        threading.Thread(target=self._run, daemon=True).start()
+
     def _run(self) -> None:
-        """Thread loop: runs until stop() is called."""
-        # TODO: while the stop event is not set:
-        #   - read_card()
-        #   - if a uid and not a duplicate -> notify
-        #   - wait poll_interval_s (hint: Event.wait() instead of time.sleep(), why?)
-        ...
- 
-    def _is_duplicate(self, uid: int) -> bool:
-        """True if same uid read less than debounce_s ago."""
-        # TODO: use time.monotonic(), not time.time() -> why?
-        ...
- 
-    def _notify(self, uid: int) -> None:
-        """Deliver the uid to on_card. THIS is where the thread-safety decision lives."""
-        # TODO: call on_card directly? or hand it to the main loop (GLib.idle_add)?
-        # TODO: an exception in on_card must not kill the thread -> how?
-        ...
+        while True:
+            uid = self.reader.read_id_no_block()
+            now = time.monotonic()
+            if uid is not None:
+                if uid != self.last_uid or now - self.last_time > RFID_DEBOUNCE:
+                    self.on_card(uid)
+                self.last_uid = uid
+                self.last_time = now
+            time.sleep(0.1)

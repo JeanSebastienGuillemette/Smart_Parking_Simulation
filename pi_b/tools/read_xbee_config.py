@@ -1,11 +1,8 @@
-# Relit la configuration d'un module XBee.
-# Lancer depuis la racine du projet : python -m tools.read_xbee_config
-import argparse
 import time
 
 import serial
 
-from help_queue import config
+from pi_b import config
 
 
 def send_at(ser, command: str, wait: float = 0.3) -> bytes:
@@ -14,8 +11,8 @@ def send_at(ser, command: str, wait: float = 0.3) -> bytes:
     return ser.read(ser.in_waiting or 1)
 
 
-def read_config(port: str):
-    ser = serial.Serial(port, 9600, timeout=2)
+def read_config():
+    ser = serial.Serial(config.XBEE_PORT, config.XBEE_BAUDRATE, timeout=2)
     time.sleep(1.2)
     ser.write(b"+++")
     time.sleep(1.2)
@@ -30,23 +27,8 @@ def read_config(port: str):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Lecture de la config XBee via mode commande AT"
-    )
-    parser.add_argument(
-        "-p",
-        "--port",
-        default=config.PORT,
-        required=config.PORT is None,
-        help=(
-            "Port série à interroger (ex: /dev/ttyUSB0, COM3). "
-            "Par défaut: PORT dans .env"
-        ),
-    )
-    args = parser.parse_args()
-
-    command_mode, pan, my, dl, dh, ch = read_config(args.port)
-    print(f"--- {args.port} ---")
+    command_mode, pan, my, dl, dh, ch = read_config()
+    print(f"--- {config.XBEE_PORT} ---")
     print("Mode commande :", command_mode)
     print("PAN ID :", pan)
     print("MY     :", my)

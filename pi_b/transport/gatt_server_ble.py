@@ -1,68 +1,113 @@
-# sur votre Raspberry Pi
-# serveur GATT avec bluezero
-
 import os
+from typing import Callable
 
-from dotenv import load_dotenv
-
-from bluezero import async_tools
 from bluezero import peripheral
 
-load_dotenv()
-
-# clés pour la communication
+# périphérique
 NOM_PERIPHERIQUE = os.environ["NOM_PERIPHERIQUE"]
-SERVICE_GATE_UUID = os.environ["SERVICE_TEMPERATURE_UUID"]
-CARD_READ_UUID = os.environ["CARACTERISTIQUE_UUID"]
-OPEN_GATE_REQUEST_UUID = os.environ["COMMANDE_UUID"]
 PI_MAC_ADDRESS = os.environ["PI_MAC_ADDRESS"]
 
-# signature d'un abonnement ou désabonnement.
-# notifying à True indique un abonnement.
-# Ici, on automatise les notifications vers le client (timer)
-def enregistrement_notifications(notifying, characteristic):
-    def notifier():
-        characteristic.set_value((f"{temp:.1f}".encode()))
-        return characteristic.is_notifying
+# UUID du service et des caractéristiques
+SERVICE_GATE_UUID = os.environ["SERVICE_GATE_UUID"]
+RESULTAT_CARTE_UUID = os.environ["RESULTAT_CARTE_UUID"]
+VOITURE_SORTIE_UUID = os.environ["VOITURE_SORTIE_UUID"]
+APPEL_AIDE_UUID = os.environ["APPEL_AIDE_UUID"]
+OUVERTURE_AGENT_UUID = os.environ["OUVERTURE_AGENT_UUID"]
 
-    if notifying:
-        async_tools.add_timer_seconds(5, notifier)
-
-
-# signature d'une réception de données (flag write)
-# le client envoie un nombre signé (ex: "+2", "-3") qui est ajouté à temp
-# def get_request(value, options):
+_SRV_ID = 1
+_CHR_RESULTAT_CARTE = 1
+_CHR_VOITURE_SORTIE = 2
+_CHR_APPEL_AIDE = 3
+_CHR_OUVERTURE_AGENT = 4
 
 
-def main():
-    # initialisation du service
-    pi_ble = peripheral.Peripheral(PI_MAC_ADDRESS, local_name=NOM_PERIPHERIQUE)
-    pi_ble.add_service(srv_id=1, uuid=SERVICE_GATE_UUID, primary=True)
+class BLEGattServer:
+    def __init__(
+        self,
+        on_voiture_sortie: Callable[[], None],
+        on_ouverture_agent: Callable[[], None],
+    ) -> None:
+        self._on_voiture_sortie = on_voiture_sortie
+        self._on_ouverture_agent = on_ouverture_agent
 
-    pi_ble.add_characteristic(
-        srv_id=1,
-        chr_id=1,
-        uuid=CARD_READ_UUID,
-        value=[],
-        notifying=False,
-        flags=["read", "notify"],
-        read_callback=get_request,
-        notify_callback=enregistrement_notifications,
+        self._peripheral = peripheral.Peripheral(
+            PI_MAC_ADDRESS, local_name=NOM_PERIPHERIQUE
+        )
+        self._peripheral.add_service(
+            srv_id=_SRV_ID, uuid=SERVICE_GATE_UUID, primary=True
+        )
+
+        self._peripheral.add_characteristic(
+            srv_id=_SRV_ID,
+            chr_id=_CHR_RESULTAT_CARTE,
+            uuid=RESULTAT_CARTE_UUID,
+            value=[0],
+            notifying=False,
+            flags=["notify"],
+        )
+        self._resultat_carte_chr = self._peripheral.characteristics[-1]
+
+        self._peripheral.add_characteristic(
+            srv_id=_SRV_ID,
+            chr_id=_CHR_VOITURE_SORTIE,
+            uuid=VOITURE_SORTIE_UUID,
+            value=[],
+            notifying=False,
+            flags=["write"],
+            write_callback=self._on_voiture_sortie_write,
+        )
+
+        self._peripheral.add_characteristic(
+            srv_id=_SRV_ID,
+            chr_id=_CHR_APPEL_AIDE,
+            uuid=APPEL_AIDE_UUID,
+            value=[0],
+            notifying=False,
+            flags=["notify"],
+        )
+        self._appel_aide_chr = self._peripheral.characteristics[-1]
+
+        self._peripheral.add_characteristic(
+            srv_id=_SRV_ID,
+            chr_id=_CHR_OUVERTURE_AGENT,
+            uuid=OUVERTURE_AGENT_UUID,
+            value=[],
+            notifying=False,
+            flags=["write"],
+            write_callback=self._on_ouverture_agent_write,
+        )
+
+    def _on_voiture_sortie_write(self, value, options) -> None:
+        self._on_voiture_sortie()
+
+    def _on_ouverture_agent_write(self, value, options) -> None:
+        self._on_ouverture_agent()
+
+    def notify_resultat_carte(self, autorisee: bool) -> None:
+        """Notifie Pi A du résultat de la décision d'autorisation."""
+        self._resultat_carte_chr.set_value([1 if autorisee else 0])
+
+    def notify_appel_aide(self) -> None:
+        """Notifie Pi C qu'un appel d'aide a été déclenché."""
+        self._appel_aide_chr.set_value([1])
+
+    def publish(self) -> None:
+        """Publie le périphérique et bloque en attente des connexions."""
+        self._peripheral.publish()
+
+
+def main() -> None:
+    def on_voiture_sortie() -> None:
+        print("TODO: ouvrir la barrière (voiture sortie)")
+
+    def on_ouverture_agent() -> None:
+        print("TODO: ouvrir la barrière (agent)")
+
+    server = BLEGattServer(
+        on_voiture_sortie=on_voiture_sortie,
+        on_ouverture_agent=on_ouverture_agent,
     )
-
-    pi_ble.add_characteristic(
-        srv_id=1,
-        chr_id=2,
-        uuid=OPEN_GATE_REQUEST_UUID,
-        value=[],
-        notifying=False,
-        flags=["write"],
-        write_callback=recevoir_commande,
-    )
-
-    # attente des connexions
-    print("Serveur GATT configuré, tentative de publication...")
-    pi_ble.publish()
+    server.publish()
 
 
 if __name__ == "__main__":
