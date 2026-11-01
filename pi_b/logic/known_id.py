@@ -10,12 +10,12 @@ class KnownCards:
 
     def __init__(self) -> None:
         self.card_list: dict[int, str] = {}
-        self.load()
+        self.load_card_list()
 
-    def load(self) -> None:
+    def load_card_list(self) -> None:
         try:
-            with open(CARDS_PATH, encoding="utf-8") as cards_json_file:
-                cards = json.load(cards_json_file)
+            with open(CARDS_PATH, encoding="utf-8") as cards_list_json_file:
+                cards = json.load(cards_list_json_file)
             self.card_list = {int(card["uid"]): card["name"] for card in cards}
         except (OSError, ValueError, KeyError, TypeError) as error:
             print(f"Chargement échoué {CARDS_PATH}, toutes les cartes vont être refusées: {error}")

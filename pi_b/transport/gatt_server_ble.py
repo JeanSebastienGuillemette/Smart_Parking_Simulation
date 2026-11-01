@@ -24,9 +24,11 @@ class BLEGattServer:
         self,
         on_voiture_sortie: Callable[[], None],
         on_ouverture_agent: Callable[[], None],
+        on_appel_aide: Callable[[], None],
     ) -> None:
         self._on_voiture_sortie = on_voiture_sortie
         self._on_ouverture_agent = on_ouverture_agent
+        self._on_appel_aide = on_appel_aide
 
         # Adresse de l'adaptateur Bluetooth du Pi, trouvée automatiquement
         adapter_address = list(adapter.Adapter.available())[0].address
@@ -79,13 +81,13 @@ class BLEGattServer:
             write_callback=self._on_ouverture_agent_write,
         )
 
-        names = {
+        characteristic_names = {
             _CHR_RESULTAT_CARTE: "RESULTAT_CARTE",
             _CHR_VOITURE_SORTIE: "VOITURE_SORTIE",
             _CHR_APPEL_AIDE: "APPEL_AIDE",
             _CHR_OUVERTURE_AGENT: "OUVERTURE_AGENT",
         }
-        for chr_id, name in names.items():
+        for chr_id, name in characteristic_names.items():
             self._peripheral.add_descriptor(
                 srv_id=_SRV_ID,
                 chr_id=chr_id,
@@ -114,6 +116,7 @@ class BLEGattServer:
         GLib.idle_add(self._resultat_carte_chr.set_value, [1 if autorisee else 0])
 
     def notify_appel_aide(self) -> None:
+        """Notifie Pi A qu'un appel d'aide a été effectué."""
         GLib.idle_add(self._appel_aide_chr.set_value, [1])
 
     def publish(self) -> None:
@@ -127,9 +130,13 @@ def main() -> None:
     def on_ouverture_agent() -> None:
         print("TODO: ouvrir la barrière (agent)")
 
+    def on_appel_aide() -> None:
+        print("TODO: gérer l'appel d'aide")
+
     server = BLEGattServer(
         on_voiture_sortie=on_voiture_sortie,
         on_ouverture_agent=on_ouverture_agent,
+        on_appel_aide=on_appel_aide,
     )
     server.publish()
 

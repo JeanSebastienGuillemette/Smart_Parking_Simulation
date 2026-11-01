@@ -1,3 +1,5 @@
+from typing import Callable
+
 import threading
 import time
 
@@ -23,7 +25,7 @@ class FakeReader:
 class RFIDSensor:
     """Lis les cartes dans son propre thread et call on_card(uid)."""
 
-    def __init__(self, on_card, reader=None) -> None:
+    def __init__(self, on_card: Callable[[int], None], reader=None) -> None:
         self.reader = reader or SimpleMFRC522()
         self.on_card = on_card
         self.last_uid = None

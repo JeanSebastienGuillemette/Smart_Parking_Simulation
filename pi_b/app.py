@@ -9,10 +9,13 @@ from pi_b.config import (
     HELP_BUTTON_PIN,
     HELP_LED_PIN,
     SERVO_PIN,
+    XBEE_BAUDRATE,
+    XBEE_PORT,
 )
 from pi_b.hardware.button import PushButton
 from pi_b.hardware.rfid import FakeReader, RFIDSensor
 from pi_b.hardware.servo import ServoMotor
+from pi_b.hardware.xbee_receiver import XBeeReceiver
 from pi_b.logic.authorization import Authorization
 from pi_b.logic.gate import Gate
 from pi_b.logic.known_id import KnownCards
@@ -55,7 +58,7 @@ class PiB:
 
     def on_etat_places(
         self, places: dict[int, bool]
-    ) -> None:  # TODO: appelé par le XBee
+    ) -> None:
         self.authorization.free_spot = any(places.values())
         print(f"ETAT_PLACES : {places}")
 
@@ -71,9 +74,7 @@ class PiB:
 
 def run() -> None:
     pi_b = PiB()
-    pi_b.authorization.free_spot = (
-        True  # TODO: retirer quand le XBee appellera on_etat_places
-    )
+    XBeeReceiver(XBEE_PORT, pi_b.on_etat_places, baud=XBEE_BAUDRATE).start()
     RFIDSensor(pi_b.on_card, reader=FakeReader(MOCK_UIDS)).start()  # TODO: vrai lecteur
 
     print("Pi B prêt (Ctrl+C pour quitter)")
