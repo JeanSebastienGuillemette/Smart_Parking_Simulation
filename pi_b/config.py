@@ -20,6 +20,11 @@ RFID_DEBOUNCE = float(os.getenv("RFID_DEBOUNCE", "3"))
 HELP_BUTTON_PIN = int(os.getenv("HELP_BUTTON_PIN", "21"))
 HELP_LED_PIN = int(os.getenv("AGENT_LED", "20"))
 
+# Buzzer
+BUZZER_PIN = int(os.getenv("BUZZER_PIN", "17"))
+BEEP_LONG = 1.2
+BEEP_SHORT = 0.2
+
 # XBee
 XBEE_PORT = os.getenv("PORT", "/dev/ttyUSB0")
 XBEE_BAUDRATE = int(os.getenv("BAUDRATE", "9600"))

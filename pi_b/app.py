@@ -3,6 +3,9 @@
 from gpiozero import LED
 
 from pi_b.config import (
+    BEEP_LONG,
+    BEEP_SHORT,
+    BUZZER_PIN,
     GATE_ANGLE_CLOSED,
     GATE_ANGLE_OPEN,
     GATE_CLOSING_DELAY,
@@ -13,6 +16,7 @@ from pi_b.config import (
     XBEE_PORT,
 )
 from pi_b.hardware.button import PushButton
+from pi_b.hardware.buzzer import PassiveBuzzer
 from pi_b.hardware.rfid import FakeReader, RFIDSensor
 from pi_b.hardware.servo import ServoMotor
 from pi_b.hardware.xbee_receiver import XBeeReceiver
@@ -36,6 +40,7 @@ class PiB:
             GATE_CLOSING_DELAY,
         )
         self.button = PushButton(HELP_BUTTON_PIN, self.on_help)
+        self.buzzer = PassiveBuzzer(BUZZER_PIN)
         self.help_led = LED(HELP_LED_PIN)
         self.ble = BLEGattServer(
             on_voiture_sortie=self.on_voiture_sortie,
@@ -46,30 +51,33 @@ class PiB:
         if self.authorization.is_authorized(uid):
             print(f"RESULTAT_CARTE : autorisé ({uid})")
             self.ble.notify_resultat_carte(True)
-            self.gate.open()
+            self.open_gate()
         else:
             print(f"RESULTAT_CARTE : refusé ({uid})")
             self.ble.notify_resultat_carte(False)
 
     def on_help(self) -> None:
         print("APPEL_AIDE")
+        self.buzzer.beep(BEEP_SHORT) # signal sonore pour le client
         self.help_led.blink(on_time=0.5, off_time=0.5)  # signal visuel pour le client
         self.ble.notify_appel_aide()
 
-    def on_etat_places(
-        self, places: dict[int, bool]
-    ) -> None:
+    def on_etat_places(self, places: dict[int, bool]) -> None:
         self.authorization.free_spot = any(places.values())
         print(f"ETAT_PLACES : {places}")
 
     def on_voiture_sortie(self) -> None:  # appelé par le BLE (Pi A)
         print("VOITURE_SORTIE : ouverture")
-        self.gate.open()
+        self.open_gate()
 
     def on_ouverture_agent(self) -> None:  # appelé par le BLE (Pi C)
         print("OUVERTURE_AGENT : ouverture")
-        self.help_led.off()  # l'agent a répondu à l'appel
-        self.gate.open()
+        self.help_led.off()
+        self.open_gate()
+
+    def open_gate(self) -> None:
+        self.buzzer.beep(BEEP_LONG)
+        self.gate.open() # Signal sonore pour le client, ouverture de la barrière
 
 
 def run() -> None:
@@ -78,6 +86,6 @@ def run() -> None:
     RFIDSensor(pi_b.on_card, reader=FakeReader(MOCK_UIDS)).start()  # TODO: vrai lecteur
 
     print("Pi B prêt (Ctrl+C pour quitter)")
-    pi_b.ble.publish()  # annonce le BLE et attend (Ctrl+C l'arrête)
+    pi_b.ble.publish()  # Ctrl+C pour quitter
     pi_b.gate.close()
     pi_b.help_led.off()
