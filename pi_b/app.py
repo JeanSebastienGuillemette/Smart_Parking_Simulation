@@ -1,5 +1,5 @@
 """Pi B"""
-
+# python -m pi_b pour starter l'application
 from gpiozero import LED
 
 from pi_b.config import (
@@ -49,18 +49,18 @@ class PiB:
     def on_card(self, uid: int) -> None:
         if self.authorization.is_authorized(uid):
             print(f"RESULTAT_CARTE : autorisé ({uid})")
-            self.buzzer.play(MELODY_ACCEPTED)  # signal sonore pour le client
+            self.buzzer.play(MELODY_ACCEPTED)
             self.ble.notify_resultat_carte(True)
             self.open_gate()
         else:
             print(f"RESULTAT_CARTE : refusé ({uid})")
-            self.buzzer.play(MELODY_REFUSED)  # signal sonore pour le client
+            self.buzzer.play(MELODY_REFUSED)
             self.ble.notify_resultat_carte(False)
 
     def on_help(self) -> None:
         print("APPEL_AIDE")
-        self.buzzer.play(MELODY_HELP)  # signal sonore pour le client
-        self.help_led.blink(on_time=0.5, off_time=0.5)  # signal visuel pour le client
+        self.buzzer.play(MELODY_HELP)
+        self.help_led.blink(on_time=0.5, off_time=0.5)
         self.ble.notify_appel_aide()
 
     def on_etat_places(self, places: dict[int, bool]) -> None:

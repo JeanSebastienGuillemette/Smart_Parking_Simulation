@@ -1,4 +1,4 @@
-import ast
+import json
 import threading
 from typing import Callable
 
@@ -27,15 +27,18 @@ class XBeeReceiver:
     def receive(self) -> str:
         return self.ser.readline().decode(errors="ignore").strip()
 
+    @staticmethod
+    def parse(data: str) -> dict[int, bool]:
+        """ex. '{"0": false, "1": "true"}' -> {0: False, 1: True}"""
+        return {int(k): v is True or str(v).lower() == "true" for k, v in json.loads(data).items()}
+
     def listen_loop(self):
         print("En écoute...")
         while True:
             data = self.receive()
             if data:
                 try:
-                    self.on_etat_places(
-                        ast.literal_eval(data)
-                    )  # ex. "{1: True, 2: False}"
+                    self.on_etat_places(self.parse(data))
                 except (ValueError, SyntaxError, AttributeError, TypeError) as e:
                     print(f"XBee : message ignoré : {data!r}: {e}")
 
