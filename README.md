@@ -23,11 +23,11 @@ MFRC522 sur SPI (broches fixes) : SDA 8, SCK 11, MOSI 10, MISO 9, RST 25.
 
 | Événement | Réaction |
 |---|---|
-| Carte lue | Décision → `RESULTAT_CARTE` vers Pi A ; si autorisée, bip long, ouverture puis fermeture après `GATE_CLOSING_DELAY` s |
+| Carte lue | Décision → `RESULTAT_CARTE` vers Pi A ; si autorisée, mélodie d'acceptation (mélodie Vader pour la carte Vader), ouverture puis fermeture après `GATE_CLOSING_DELAY` s (`GATE_CLOSING_DELAY_VADER` s pour la carte Vader) ; si refusée, mélodie de refus |
 | `ETAT_PLACES` reçu (XBee) | Mémorise le dernier état des places |
-| `VOITURE_SORTIE` reçu (Pi A) | Bip long, ouvre la barrière |
-| Appui sur le bouton d'aide | `APPEL_AIDE` vers Pi C, bip court, la LED d'aide clignote |
-| `OUVERTURE_AGENT` reçu (Pi C) | Éteint la LED d'aide, bip long, ouvre la barrière |
+| `VOITURE_SORTIE` reçu (Pi A) | Ouvre la barrière |
+| Appui sur le bouton d'aide | `APPEL_AIDE` vers Pi C, mélodie d'aide, la LED d'aide clignote |
+| `OUVERTURE_AGENT` reçu (Pi C) | Éteint la LED d'aide, ouvre la barrière |
 
 **Règle d'autorisation :** carte dans la liste **ET** au moins une place libre dans le dernier `ETAT_PLACES`. Cette règle est isolée dans une seule méthode : `Authorization.is_authorized` (`logic/authorization.py`).
 

@@ -18,7 +18,7 @@ NOTE_RATIO = (
 )
 
 # (fréquence, durée en s)
-MELODY = [
+MELODY_VADER = [
     (G4, QUARTER),
     (G4, QUARTER),
     (G4, QUARTER),

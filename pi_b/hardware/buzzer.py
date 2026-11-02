@@ -18,8 +18,11 @@ class PassiveBuzzer:
 
     def _play(self, notes, stop: threading.Event) -> None:
         for frequency, duration in notes:
-            self.pwm.frequency = frequency
-            self.pwm.value = 0.5
+            if frequency:
+                self.pwm.frequency = frequency
+                self.pwm.value = 0.5
+            else:
+                self.pwm.off()  # silence
             if stop.wait(duration):
                 return
         self.pwm.off()

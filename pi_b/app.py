@@ -1,4 +1,5 @@
 """Pi B"""
+
 # python -m pi_b pour starter l'application
 from gpiozero import LED
 
@@ -7,12 +8,15 @@ from pi_b.config import (
     GATE_ANGLE_CLOSED,
     GATE_ANGLE_OPEN,
     GATE_CLOSING_DELAY,
+    GATE_CLOSING_DELAY_VADER,
     HELP_BUTTON_PIN,
     HELP_LED_PIN,
     MELODY_ACCEPTED,
     MELODY_HELP,
     MELODY_REFUSED,
+    MELODY_VADER,
     SERVO_PIN,
+    VADER_CARD_NAME,
     XBEE_BAUDRATE,
     XBEE_PORT,
 )
@@ -49,9 +53,14 @@ class PiB:
     def on_card(self, uid: int) -> None:
         if self.authorization.is_authorized(uid):
             print(f"RESULTAT_CARTE : autorisé ({uid})")
-            self.buzzer.play(MELODY_ACCEPTED)
-            self.ble.notify_resultat_carte(True)
-            self.open_gate()
+            if self.authorization.known_cards.name_of(uid) == VADER_CARD_NAME:
+                self.buzzer.play(MELODY_VADER)
+                self.ble.notify_resultat_carte(True)
+                self.open_gate(GATE_CLOSING_DELAY_VADER)
+            else:
+                self.buzzer.play(MELODY_ACCEPTED)
+                self.ble.notify_resultat_carte(True)
+                self.open_gate()
         else:
             print(f"RESULTAT_CARTE : refusé ({uid})")
             self.buzzer.play(MELODY_REFUSED)
@@ -76,8 +85,8 @@ class PiB:
         self.help_led.off()
         self.open_gate()
 
-    def open_gate(self) -> None:
-        self.gate.open()
+    def open_gate(self, closing_delay: float | None = None) -> None:
+        self.gate.open(closing_delay)
 
 
 def run() -> None:

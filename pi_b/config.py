@@ -10,6 +10,7 @@ load_dotenv(ROOT_DIR / ".env")
 # Gate
 SERVO_PIN = int(os.getenv("SERVO_PIN", "18"))
 GATE_CLOSING_DELAY = float(os.getenv("GATE_CLOSING_DELAY", "10"))
+GATE_CLOSING_DELAY_VADER = float(os.getenv("GATE_CLOSING_DELAY_VADER", "10"))
 GATE_ANGLE_OPEN = 90
 GATE_ANGLE_CLOSED = 0
 
@@ -25,6 +26,32 @@ BUZZER_PIN = int(os.getenv("BUZZER_PIN", "17"))
 MELODY_HELP = [(2000, 0.2)]
 MELODY_ACCEPTED = [(2000, 0.1), (2500, 0.15)]
 MELODY_REFUSED = [(750, 1)]
+
+VADER_CARD_NAME = "Darth Vader"
+_G4, _GB4, _EB4, _BB4, _D5, _EB5 = 392, 370, 311, 466, 587, 622
+_IMPERIAL_MARCH = [
+    (_G4, 0.5),
+    (_G4, 0.5),
+    (_G4, 0.5),
+    (_EB4, 0.35),
+    (_BB4, 0.15),
+    (_G4, 0.5),
+    (_EB4, 0.35),
+    (_BB4, 0.15),
+    (_G4, 1.0),
+    (_D5, 0.5),
+    (_D5, 0.5),
+    (_D5, 0.5),
+    (_EB5, 0.35),
+    (_BB4, 0.15),
+    (_GB4, 0.5),
+    (_EB4, 0.35),
+    (_BB4, 0.15),
+    (_G4, 1.0),
+]
+MELODY_VADER = [
+    step for f, d in _IMPERIAL_MARCH for step in ((f, d * 0.9), (0, d * 0.1))
+]
 
 # XBee
 XBEE_PORT = os.getenv("PORT", "/dev/ttyUSB0")

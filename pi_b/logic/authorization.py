@@ -6,7 +6,7 @@ class Authorization:
 
     def __init__(self, known_cards: KnownCards) -> None:
         self.known_cards = known_cards
-        self.free_spot = False
+        self.free_spot = True
 
     def is_authorized(self, uid: int) -> bool:
         return self.known_cards.is_known(uid) and self.free_spot

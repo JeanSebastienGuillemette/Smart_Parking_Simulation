@@ -22,13 +22,14 @@ class Gate:
         self._lock = threading.Lock()
         self.close()
 
-    def open(self) -> None:
+    def open(self, closing_delay: float | None = None) -> None:
+        delay = self.closing_delay if closing_delay is None else closing_delay
         with self._lock:
             if self._timer:
                 self._timer.cancel()
             self.servo.move_to(self.angle_open)
             self._is_opened = True
-            self._timer = threading.Timer(self.closing_delay, self.close)
+            self._timer = threading.Timer(delay, self.close)
             self._timer.daemon = True
             self._timer.start()
 
