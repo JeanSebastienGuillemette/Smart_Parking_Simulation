@@ -5,14 +5,21 @@ from gpiozero import PWMOutputDevice
 
 class PassiveBuzzer:
 
-    def __init__(self, pin: int, frequency: float = 2000) -> None:
-        self.pwm = PWMOutputDevice(pin, frequency=frequency)
-        self._timer: threading.Timer | None = None
+    def __init__(self, pin: int) -> None:
+        self.pwm = PWMOutputDevice(pin)
+        self._stop = threading.Event()
 
-    def beep(self, duration: float) -> None:
-        if self._timer:
-            self._timer.cancel()
-        self.pwm.value = 0.5
-        self._timer = threading.Timer(duration, self.pwm.off)
-        self._timer.daemon = True
-        self._timer.start()
+    def play(self, notes) -> None:
+        self._stop.set()
+        self._stop = threading.Event()
+        threading.Thread(
+            target=self._play, args=(notes, self._stop), daemon=True
+        ).start()
+
+    def _play(self, notes, stop: threading.Event) -> None:
+        for frequency, duration in notes:
+            self.pwm.frequency = frequency
+            self.pwm.value = 0.5
+            if stop.wait(duration):
+                return
+        self.pwm.off()

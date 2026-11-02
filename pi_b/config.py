@@ -22,8 +22,9 @@ HELP_LED_PIN = int(os.getenv("HELP_LED_PIN", "20"))
 
 # Buzzer
 BUZZER_PIN = int(os.getenv("BUZZER_PIN", "17"))
-BEEP_LONG = 1.2
-BEEP_SHORT = 0.2
+MELODY_HELP = [(2000, 0.2)]
+MELODY_ACCEPTED = [(2000, 0.1), (2500, 0.15)]
+MELODY_REFUSED = [(750, 1)]
 
 # XBee
 XBEE_PORT = os.getenv("PORT", "/dev/ttyUSB0")

@@ -13,7 +13,7 @@ Module du **TP2 Stationnement intelligent**. Pi B est le serveur GATT de l'équi
 | Servo SG90 | Barrière |
 | Bouton d'aide | Appel d'aide du client |
 | LED d'aide | Clignote pendant un appel d'aide |
-| Buzzer passif | Bip court (aide), bip long (ouverture) |
+| Buzzer passif | Bip court (aide), mélodie montante / descendante (carte autorisée / refusée) |
 | XBee | Réception de `ETAT_PLACES` (broadcast de Pi C) |
 | BLE | Serveur GATT pour Pi A et Pi C |
 
@@ -114,7 +114,7 @@ Pas de pytest : chaque test est un script, lancé depuis la racine avec `python 
 | `gate_test` | servo | Fermeture automatique de la barrière |
 | `led_test` | LED | Allumer, éteindre, clignoter |
 | `button_test` | bouton, LED | Chaque appui démarre / arrête le clignotement |
-| `buzzer_test` | buzzer | Bips court et long, choix de la fréquence |
+| `buzzer_test` | buzzer | Bip d'aide, mélodies de carte, choix de la fréquence |
 | `buzzer_vader` | buzzer | Mélodie au buzzer |
 | `ble_test` | tout + cellulaire (nRF Connect) | Caractéristiques GATT |
 | `app_mock_test` | tout sauf Pi A / Pi C | Les 5 scénarios ci-dessous, au clavier |

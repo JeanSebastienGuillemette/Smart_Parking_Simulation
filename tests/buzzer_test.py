@@ -1,11 +1,11 @@
-"""Test : le buzzer passif (beep court, beep long, recherche de la meilleure fréquence).
+"""Test : le buzzer passif (mélodies, remplacement, recherche de la meilleure fréquence).
 
 Lancer depuis la racine du projet : python -m tests.buzzer_test
 """
 
 from time import sleep
 
-from pi_b.config import BEEP_LONG, BEEP_SHORT, BUZZER_PIN
+from pi_b.config import BUZZER_PIN, MELODY_ACCEPTED, MELODY_HELP, MELODY_REFUSED
 from pi_b.hardware.buzzer import PassiveBuzzer
 
 FREQUENCIES = [
@@ -18,27 +18,30 @@ FREQUENCIES = [
 buzzer = PassiveBuzzer(BUZZER_PIN)
 
 try:
-    print(f"1. Beep court ({BEEP_SHORT} s) : bouton d'aide")
-    buzzer.beep(BEEP_SHORT)
-    sleep(BEEP_SHORT + 1)
+    print("1. Bip court : bouton d'aide")
+    buzzer.play(MELODY_HELP)
+    sleep(1)
 
-    print(f"2. Beep long ({BEEP_LONG} s) : ouverture de la barrière")
-    buzzer.beep(BEEP_LONG)
-    sleep(BEEP_LONG + 1)
+    print("2. Mélodie montante : carte autorisée")
+    buzzer.play(MELODY_ACCEPTED)
+    sleep(1.5)
+
+    print("3. Mélodie descendante : carte refusée")
+    buzzer.play(MELODY_REFUSED)
+    sleep(1.5)
 
     print(
-        "3. Beep long, puis beep court après 0.3 s : le son s'arrête à 0.5 s (le 2e remplace le 1er)"
+        "4. Note de 1.2 s, puis bip court après 0.3 s : le son s'arrête à 0.5 s (le 2e remplace le 1er)"
     )
-    buzzer.beep(BEEP_LONG)
+    buzzer.play([(2000, 1.2)])
     sleep(0.3)
-    buzzer.beep(BEEP_SHORT)
-    sleep(BEEP_LONG + 1)
+    buzzer.play(MELODY_HELP)
+    sleep(2)
 
-    print("4. Fréquences : noter celle qui sonne le plus fort")
+    print("5. Fréquences : noter celle qui sonne le plus fort")
     for frequency in FREQUENCIES:
         print(f"   {frequency} Hz")
-        buzzer.pwm.frequency = frequency
-        buzzer.beep(0.5)
+        buzzer.play([(frequency, 0.5)])
         sleep(1)
 except KeyboardInterrupt:
     pass

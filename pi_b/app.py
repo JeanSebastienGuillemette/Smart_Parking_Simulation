@@ -3,14 +3,15 @@
 from gpiozero import LED
 
 from pi_b.config import (
-    BEEP_LONG,
-    BEEP_SHORT,
     BUZZER_PIN,
     GATE_ANGLE_CLOSED,
     GATE_ANGLE_OPEN,
     GATE_CLOSING_DELAY,
     HELP_BUTTON_PIN,
     HELP_LED_PIN,
+    MELODY_ACCEPTED,
+    MELODY_HELP,
+    MELODY_REFUSED,
     SERVO_PIN,
     XBEE_BAUDRATE,
     XBEE_PORT,
@@ -50,15 +51,17 @@ class PiB:
     def on_card(self, uid: int) -> None:
         if self.authorization.is_authorized(uid):
             print(f"RESULTAT_CARTE : autorisé ({uid})")
+            self.buzzer.play(MELODY_ACCEPTED)  # signal sonore pour le client
             self.ble.notify_resultat_carte(True)
             self.open_gate()
         else:
             print(f"RESULTAT_CARTE : refusé ({uid})")
+            self.buzzer.play(MELODY_REFUSED)  # signal sonore pour le client
             self.ble.notify_resultat_carte(False)
 
     def on_help(self) -> None:
         print("APPEL_AIDE")
-        self.buzzer.beep(BEEP_SHORT) # signal sonore pour le client
+        self.buzzer.play(MELODY_HELP)  # signal sonore pour le client
         self.help_led.blink(on_time=0.5, off_time=0.5)  # signal visuel pour le client
         self.ble.notify_appel_aide()
 
@@ -76,8 +79,7 @@ class PiB:
         self.open_gate()
 
     def open_gate(self) -> None:
-        self.buzzer.beep(BEEP_LONG)
-        self.gate.open() # Signal sonore pour le client, ouverture de la barrière
+        self.gate.open()
 
 
 def run() -> None:
