@@ -1,5 +1,14 @@
 [
-    {"uid": 111111111111, "name": "Employee A"},
-    {"uid": 222222222222, "name": "Employee B"},
-    {"uid": 333333333333, "name": "Employee C"}
+    {
+        "uid": 111111111111,
+        "name": "Employee A"
+    },
+    {
+        "uid": 222222222222,
+        "name": "Employee B"
+    },
+    {
+        "uid": 333333333333,
+        "name": "Employee C"
+    }
 ]

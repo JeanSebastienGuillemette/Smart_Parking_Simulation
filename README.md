@@ -2,8 +2,7 @@
 
 Module du **TP2 Stationnement intelligent**. Pi B est le serveur GATT de l'équipe : il décide si une carte est autorisée, contrôle la barrière (entrée et sortie) et relaie l'appel d'aide du client vers l'agent.
 
-> **État :** en développement. La logique, la barrière, le bouton d'aide, le BLE et le XBee fonctionnent.
-> Le lecteur RFID est encore simulé (`FakeReader` dans `app.py`).
+> **État :** en développement. La logique, la barrière, le lecteur RFID, le bouton d'aide, le BLE et le XBee fonctionnent.
 
 ## Matériel
 

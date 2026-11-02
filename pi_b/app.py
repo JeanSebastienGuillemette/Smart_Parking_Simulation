@@ -18,15 +18,13 @@ from pi_b.config import (
 )
 from pi_b.hardware.button import PushButton
 from pi_b.hardware.buzzer import PassiveBuzzer
-from pi_b.hardware.rfid import FakeReader, RFIDSensor
+from pi_b.hardware.rfid import RFIDSensor
 from pi_b.hardware.servo import ServoMotor
 from pi_b.hardware.xbee_receiver import XBeeReceiver
 from pi_b.logic.authorization import Authorization
 from pi_b.logic.gate import Gate
 from pi_b.logic.known_id import KnownCards
 from pi_b.transport.gatt_server_ble import BLEGattServer
-
-MOCK_UIDS = [111111111111, 999999999999]
 
 
 class PiB:
@@ -85,7 +83,7 @@ class PiB:
 def run() -> None:
     pi_b = PiB()
     XBeeReceiver(XBEE_PORT, pi_b.on_etat_places, baud=XBEE_BAUDRATE).start()
-    RFIDSensor(pi_b.on_card, reader=FakeReader(MOCK_UIDS)).start()  # TODO: vrai lecteur
+    RFIDSensor(pi_b.on_card).start()
 
     print("Pi B prêt (Ctrl+C pour quitter)")
     pi_b.ble.publish()  # Ctrl+C pour quitter

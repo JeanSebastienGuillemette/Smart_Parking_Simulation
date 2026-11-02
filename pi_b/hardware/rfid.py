@@ -8,20 +8,6 @@ from mfrc522 import SimpleMFRC522
 from pi_b.config import RFID_DEBOUNCE
 
 
-class FakeReader:
-    """Généré à 100% par Claude pour faire un faux reader rfid car les miens ne sont pas soudés!"""
-
-    def __init__(self, uids: list[int]) -> None:
-        self.uids = uids
-        self.index = 0
-
-    def read_id_no_block(self) -> int:
-        time.sleep(5)
-        uid = self.uids[self.index % len(self.uids)]
-        self.index += 1
-        return uid
-
-
 class RFIDSensor:
     """Lis les cartes dans son propre thread et call on_card(uid)."""
 
