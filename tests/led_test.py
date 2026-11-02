@@ -14,7 +14,7 @@ BLINK_COUNT = 5
 BLINK_TIME = 0.3  # seconds on, then seconds off
 
 load_dotenv()
-led = LED(int(os.getenv("AGENT_LED", "20")))
+led = LED(int(os.getenv("HELP_LED_PIN", "20")))
 
 try:
     print("LED on")

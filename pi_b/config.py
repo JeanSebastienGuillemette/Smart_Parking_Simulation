@@ -18,7 +18,7 @@ RFID_DEBOUNCE = float(os.getenv("RFID_DEBOUNCE", "3"))
 
 # Help button
 HELP_BUTTON_PIN = int(os.getenv("HELP_BUTTON_PIN", "21"))
-HELP_LED_PIN = int(os.getenv("AGENT_LED", "20"))
+HELP_LED_PIN = int(os.getenv("HELP_LED_PIN", "20"))
 
 # Buzzer
 BUZZER_PIN = int(os.getenv("BUZZER_PIN", "17"))

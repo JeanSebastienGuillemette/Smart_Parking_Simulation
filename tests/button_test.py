@@ -12,7 +12,7 @@ from gpiozero import LED, Button
 BLINK_TIME = 0.3  # seconds on, then seconds off
 
 load_dotenv()
-led = LED(int(os.getenv("AGENT_LED", "20")))
+led = LED(int(os.getenv("HELP_LED_PIN", "20")))
 button = Button(int(os.getenv("HELP_BUTTON_PIN", "21")), bounce_time=0.05)
 
 blinking = False
