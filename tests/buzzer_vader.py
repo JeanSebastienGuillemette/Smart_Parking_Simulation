@@ -43,7 +43,7 @@ buzzer = PassiveBuzzer(BUZZER_PIN)
 
 try:
     print("Marche impériale")
-    for frequency, duration in MELODY:
+    for frequency, duration in MELODY_VADER:
         buzzer.play([(frequency, duration * NOTE_RATIO)])
         sleep(duration)
 except KeyboardInterrupt:
