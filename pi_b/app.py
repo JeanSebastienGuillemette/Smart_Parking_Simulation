@@ -73,7 +73,7 @@ class PiB:
         self.ble.notify_appel_aide()
 
     def on_etat_places(self, places: dict[int, bool]) -> None:
-        self.authorization.free_spot = any(places.values())
+        self.authorization.free_spot = not all(places.values())  # valeur = is_occupied
         print(f"ETAT_PLACES : {places}")
 
     def on_voiture_sortie(self) -> None:  # appelé par le BLE (Pi A)

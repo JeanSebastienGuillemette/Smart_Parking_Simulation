@@ -15,12 +15,12 @@ print(f"Diffusion sur {XBEE_PORT} à {XBEE_BAUDRATE} bauds (Ctrl+C pour quitter)
 
 with serial.Serial(XBEE_PORT, XBEE_BAUDRATE, timeout=1) as ser:
     try:
-        libre = True
+        occupee = True
         while True:
-            message = json.dumps({"0": libre, "1": not libre})
+            message = json.dumps({"0": occupee, "1": not occupee})
             ser.write((message + "\n").encode())
             print(message)
-            libre = not libre
+            occupee = not occupee
             time.sleep(INTERVALLE)
     except KeyboardInterrupt:
         print("\nFin du test")
