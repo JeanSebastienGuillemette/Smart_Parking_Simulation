@@ -91,6 +91,17 @@ pip install --no-deps mfrc522   # sans --no-deps, il installe RPi.GPIO, incompat
    python -m pi_b.tools.configure_xbee
    python -m pi_b.tools.read_xbee_config   # vérification
    ```
+5. Désactiver le Bluetooth MIDI, **sur les 3 Pi** :
+   ```bash
+   mkdir -p ~/.config/wireplumber/wireplumber.conf.d && printf 'wireplumber.profiles = { main = { monitor.bluez-midi = disabled } }\n' > ~/.config/wireplumber/wireplumber.conf.d/51-disable-bluez-midi.conf && systemctl --user restart wireplumber
+   ```
+   Pourquoi : Raspberry Pi OS (via WirePlumber) publie un service Bluetooth MIDI qui exige le chiffrement. Quand deux Pi se connectent, chacun lit le service MIDI de l'autre, ce qui déclenche une demande d'appairage. Accepter crée un appairage inutile ; refuser coupe la connexion. Notre service GATT, lui, n'a pas besoin d'appairage.
+   À lancer avec le compte connecté au bureau (pas de `sudo`). Vérification : `bluetoothctl show | grep 03b80e5a` ne doit rien afficher.
+
+   Pour réactiver le MIDI :
+   ```bash
+   rm ~/.config/wireplumber/wireplumber.conf.d/51-disable-bluez-midi.conf && systemctl --user restart wireplumber
+   ```
 
 `.env` et `cards.json` sont ignorés par Git : ne jamais les committer.
 
