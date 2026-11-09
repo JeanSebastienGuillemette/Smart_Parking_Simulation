@@ -5,10 +5,12 @@ Lancer depuis la racine du projet : python -m tests.app_mock_test
 
 from pi_b.app import PiB
 
-KNOWN_UID = 111111111111
 UNKNOWN_UID = 999999999999
 
 pi_b = PiB()
+KNOWN_UID = next(iter(pi_b.authorization.known_cards.card_list), None)
+if KNOWN_UID is None:
+    print("cards.json vide ou absent : 'c' sera refusé")
 
 print(
     "c=carte connue  i=carte inconnue  l=places libres  p=complet  "
@@ -21,9 +23,9 @@ try:
         elif key == "i":
             pi_b.on_card(UNKNOWN_UID)
         elif key == "l":
-            pi_b.on_etat_places({1: True, 2: True})
+            pi_b.on_etat_places({0: False, 1: False})  # valeur = occupée
         elif key == "p":
-            pi_b.on_etat_places({1: False, 2: False})
+            pi_b.on_etat_places({0: True, 1: True})
         elif key == "s":
             pi_b.on_voiture_sortie()
         elif key == "a":
